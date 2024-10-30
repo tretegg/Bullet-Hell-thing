@@ -5,12 +5,15 @@
 
     let player: Player
     let canvas: HTMLCanvasElement
+    const SIZE = 10 as number;
 
     onMount(() => {
         console.log(canvas)
 
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        let spawnInterval = 1 as number;
+        ctx.scale(SIZE, SIZE);
+        let spawnInterval = 10 as number;
+        let score = 0 as number;
 
         // Set the canvas dimensions to match the screen size
         canvas.width = window.innerWidth;
@@ -24,6 +27,7 @@
         function play() : void { 
             setInterval(newBullet, spawnInterval);
             setInterval(draw, 10);
+            // setInterval(updateScore, 1000);
         }
 
         function draw() : void {
@@ -38,7 +42,7 @@
                 let currentBullet = bulletArray[i];
 
                 ctx.fillStyle = 'blue';
-                ctx.fillRect(currentBullet.x, currentBullet.y, 10, 10);
+                ctx.fillRect(currentBullet.x, currentBullet.y, SIZE, SIZE);
 
                 currentBullet.updatePos();
 
@@ -48,7 +52,15 @@
                 }
             }
             ctx.fillStyle = 'red';
-            ctx.fillRect(player.x, player.y, 10, 10);
+            ctx.fillRect(player.x, player.y, SIZE, SIZE);
+
+            if (collision()) {
+                console.log('Collision');
+                player.x = canvas.width / 2;
+                player.y = canvas.height - canvas.height / 4;
+                bulletArray = [];
+                score = 0;
+            }
         }
 
         function newBullet() : void {
@@ -57,8 +69,29 @@
             bulletArray.push(bullet);
         }
 
+        function collision() : boolean {
+            for (let i = 0; i < bulletArray.length; i++) {
+                let currentBullet = bulletArray[i];
+                if (
+                    player.x < currentBullet.x + SIZE &&
+                    player.x + SIZE > currentBullet.x &&
+                    player.y < currentBullet.y + SIZE &&
+                    player.y + SIZE > currentBullet.y
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateScore() : void {
+            score++;
+            (document.getElementById('score') as HTMLElement).innerHTML = 'Score: ' + score;
+        }
+
         play()
     })
+
 
     let gurboisis: boolean[] = []
     let gurboisis2: boolean[] = []
@@ -101,14 +134,36 @@
         }
     }
 
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
 </script>
 
 <canvas bind:this={canvas} class="border-0" id="screen-canvas"></canvas>
 
+<h1 class="text-3xl font-bold underline header" id="score">Score: 0</h1>
+<h1 class="text-3xl font-bold underline header" id="highscore">High score: 0</h1>
 
 <style lang="postcss">
     canvas {
         background-color: burlywood;
+        position: relative;
+    }
+    .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        color: white;
+        padding: 10px;
+    }
+    #score {
+        text-align: center;
+    }
+    #highscore {
+        text-align: left;
     }
 </style>
 
