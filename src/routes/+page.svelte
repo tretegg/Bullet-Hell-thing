@@ -44,21 +44,19 @@
             for (let i = 0; i < bulletArray.length; i++) {
                 let currentBullet = bulletArray[i];
 
-                ctx.fillStyle = 'blue';
+                ctx.fillStyle = 'grey';
                 ctx.fillRect(currentBullet.x, currentBullet.y, SIZE, SIZE);
 
                 currentBullet.updatePos();
 
                 if (currentBullet.checkBounds()) {
                     bulletArray.splice(i, 1);
-                    // console.log('Bullet removed');
                 }
             }
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'white';
             ctx.fillRect(player.x, player.y, SIZE, SIZE);
 
             if (collision()) {
-                console.log('Collision');
                 player.x = canvas.width / 2;
                 player.y = canvas.height - canvas.height / 4;
                 bulletArray = [];
@@ -70,7 +68,6 @@
 
         function newBullet() : void {
             let bullet = new Bullet(canvas, ctx);
-            // console.log(bullet);
             bulletArray.push(bullet);
         }
 
@@ -94,9 +91,11 @@
             if (Cookies.get('highscore') === undefined) {
                 Cookies.set('highscore', 0);
             }
-            if (Cookies.get('highscore') < score) {
+            else if (Cookies.get('highscore') < score) {
                 Cookies.set('highscore', score);
             }
+            //console.log("Highscore: " + Cookies.get('highscore'));
+            //console.log("Score: " + score);    
         }
 
         play()
@@ -150,6 +149,10 @@
         }
     }
 
+    function resetHighscore() {
+        Cookies.set('highscore', 0);
+    }
+
 
 </script>
 
@@ -157,10 +160,11 @@
 
 <h1 class="text-3xl font-bold underline header" id="score">Score: 0</h1>
 <h1 class="text-3xl font-bold underline header" id="highscore">Highscore: 0</h1>
+<button on:click={resetHighscore}>Reset Highscore</button>
 
 <style lang="postcss">
     canvas {
-        background-color: burlywood;
+        background-color: rgb(0, 0, 0);
         position: relative;
     }
     .header {
@@ -176,6 +180,11 @@
     }
     #highscore {
         text-align: left;
+    }
+    button {
+        position: absolute;
+        top: 0;
+        right: 10px;
     }
 </style>
 

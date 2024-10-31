@@ -32,7 +32,7 @@ export class Bullet {
     }
 
     checkBounds() : boolean {
-        return this.x < 0 || this.x > this.width || this.y < 0 || this.y > this.height;
+        return this.x < -100 || this.x > this.width + 100 || this.y < -100 || this.y > this.height + 100;
     }
 
 }
