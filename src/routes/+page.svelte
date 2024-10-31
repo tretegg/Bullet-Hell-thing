@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import { Bullet } from "$lib/Components/canvas/Bullet";
     import { Player } from "$lib/Components/canvas/Player";
+    // @ts-ignore
+    import Cookies from 'js-cookie';
 
     let player: Player
     let canvas: HTMLCanvasElement
@@ -14,6 +16,7 @@
         ctx.scale(SIZE, SIZE);
         let spawnInterval = 10 as number;
         let score = 0 as number;
+        
 
         // Set the canvas dimensions to match the screen size
         canvas.width = window.innerWidth;
@@ -27,7 +30,7 @@
         function play() : void { 
             setInterval(newBullet, spawnInterval);
             setInterval(draw, 10);
-            // setInterval(updateScore, 1000);
+            setInterval(updateScore, 1000);
         }
 
         function draw() : void {
@@ -61,6 +64,8 @@
                 bulletArray = [];
                 score = 0;
             }
+            (document.getElementById('score') as HTMLElement).innerHTML = 'Score: ' + score;
+            (document.getElementById('highscore') as HTMLElement).innerHTML = 'Highscore: ' + Cookies.get('highscore'); 
         }
 
         function newBullet() : void {
@@ -86,10 +91,21 @@
 
         function updateScore() : void {
             score++;
-            (document.getElementById('score') as HTMLElement).innerHTML = 'Score: ' + score;
+            if (Cookies.get('highscore') === undefined) {
+                Cookies.set('highscore', 0);
+            }
+            if (Cookies.get('highscore') < score) {
+                Cookies.set('highscore', score);
+            }
         }
 
         play()
+
+        window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        });
+
     })
 
 
@@ -134,17 +150,13 @@
         }
     }
 
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
 
 </script>
 
 <canvas bind:this={canvas} class="border-0" id="screen-canvas"></canvas>
 
 <h1 class="text-3xl font-bold underline header" id="score">Score: 0</h1>
-<h1 class="text-3xl font-bold underline header" id="highscore">High score: 0</h1>
+<h1 class="text-3xl font-bold underline header" id="highscore">Highscore: 0</h1>
 
 <style lang="postcss">
     canvas {
